@@ -6,6 +6,29 @@ for energy and network observability, automation, and future AI integration.
 It is designed to run on a single Proxmox node and provide a modular, reproducible edge data platform.
 
 ---
+## ☕ Support the Project
+
+If you find Mini-DC useful, consider supporting its development.
+
+Your support helps maintain and improve the platform.
+
+### 💛 Donate
+
+- Buy Me a Coffee: https://buymeacoffee.com/rujji
+- PayPal: https://paypal.me/rujji
+
+---
+
+## 🧠 Support in Other Ways
+
+You can also support by:
+
+- ⭐ Starring the repository
+- 🍴 Forking and contributing
+- 🐛 Reporting issues
+- 📢 Sharing the project
+
+---
 
 ## Architecture Overview
 
