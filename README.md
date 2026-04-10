@@ -63,14 +63,14 @@ Intelligence  : Microservices (optimization / prediction)
 
 
 >mini-dc/
->├── proxmox/        # IaC (VM + LXC provisioning)
->├── mqtt/           # MQTT broker setup
->├── collector/      # Telegraf (data ingestion)
->├── monitoring/     # InfluxDB + Grafana
->├── ha/             # Home Assistant
->├── microservices/  # Optimization / prediction
->├── docs/           # Architecture + runbook
->└── install.sh      # One-command deployment
+>├── proxmox/        - IaC (VM + LXC provisioning)
+>├── mqtt/           - MQTT broker setup
+>├── collector/      - Telegraf (data ingestion)
+>├── monitoring/     - InfluxDB + Grafana
+>├── ha/             - Home Assistant
+>├── microservices/  - Optimization / prediction
+>├── docs/           - Architecture + runbook
+>└── install.sh      - One-command deployment
 
 ---
 
@@ -114,7 +114,7 @@ After installation:
 
 Base pattern:
 
-mini-dc/{<zone>}/{<domain>}/{<device>}
+mini-dc/{zone}/{domain}/{device}
 
 Examples:
 
