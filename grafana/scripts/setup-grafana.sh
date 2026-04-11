@@ -55,6 +55,23 @@ EOF"
 done
 
 # ==============================
+# PROVISION DASHBOARD
+# ==============================
+echo "📊 Provisioning dashboards..."
+
+pct exec $CTID -- bash -c "
+mkdir -p /var/lib/grafana/dashboards
+mkdir -p /etc/grafana/provisioning/dashboards
+"
+
+# copy dashboard files
+pct push $CTID ../config/dashboards/energy.json /var/lib/grafana/dashboards/energy.json
+pct push $CTID ../config/dashboards/network.json /var/lib/grafana/dashboards/network.json
+
+# copy provisioning config
+pct push $CTID ../config/provisioning/dashboards.yamlc
+
+# ==============================
 # RESTART GRAFANA
 # ==============================
 pct exec $CTID -- systemctl restart grafana-server

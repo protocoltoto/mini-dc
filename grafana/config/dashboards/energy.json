@@ -1,0 +1,54 @@
+{
+  "title": "Energy Overview",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "templating": {
+    "list": [
+      {
+        "name": "zone",
+        "type": "query",
+        "datasource": "InfluxDB-energy",
+        "query": "import \"influxdata/influxdb/schema\" schema.tagValues(bucket: \"energy\", tag: \"zone\")"
+      },
+      {
+        "name": "device",
+        "type": "query",
+        "datasource": "InfluxDB-energy",
+        "query": "import \"influxdata/influxdb/schema\" schema.tagValues(bucket: \"energy\", tag: \"device\")"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Power (W)",
+      "targets": [
+        {
+          "query": "from(bucket: \"energy\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"mqtt_consumer\") |> filter(fn: (r) => r.zone == v.zone) |> filter(fn: (r) => r.device == v.device)"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Voltage (V)",
+      "targets": [
+        {
+          "query": "from(bucket: \"energy\") |> range(start: -1h) |> filter(fn: (r) => r._field == \"voltage\") |> filter(fn: (r) => r.zone == v.zone)"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Battery SOC (%)",
+      "targets": [
+        {
+          "query": "from(bucket: \"energy\") |> range(start: -1h) |> filter(fn: (r) => r._field == \"soc\") |> filter(fn: (r) => r.zone == v.zone)"
+        }
+      ],
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 }
+    }
+  ]
+}

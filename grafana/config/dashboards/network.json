@@ -1,0 +1,44 @@
+{
+  "title": "Network Overview",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "templating": {
+    "list": [
+      {
+        "name": "zone",
+        "type": "query",
+        "datasource": "InfluxDB-network",
+        "query": "import \"influxdata/influxdb/schema\" schema.tagValues(bucket: \"network\", tag: \"zone\")"
+      },
+      {
+        "name": "device",
+        "type": "query",
+        "datasource": "InfluxDB-network",
+        "query": "import \"influxdata/influxdb/schema\" schema.tagValues(bucket: \"network\", tag: \"device\")"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Latency (ms)",
+      "targets": [
+        {
+          "query": "from(bucket: \"network\") |> range(start: -1h) |> filter(fn: (r) => r._field == \"latency\") |> filter(fn: (r) => r.zone == v.zone)"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Bandwidth (Mbps)",
+      "targets": [
+        {
+          "query": "from(bucket: \"network\") |> range(start: -1h) |> filter(fn: (r) => r._field == \"bandwidth\") |> filter(fn: (r) => r.zone == v.zone)"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 }
+    }
+  ]
+}

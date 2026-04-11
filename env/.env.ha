@@ -1,0 +1,13 @@
+CTID=201
+HOSTNAME=haos
+
+CORES=2
+MEMORY=2048
+DISK=40G
+
+STORAGE=local-lvm
+BRIDGE=vmbr0
+
+HA_HOST=192.168.88.50
+# network (optional)
+IP=dhcp

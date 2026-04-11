@@ -1,0 +1,25 @@
+{
+  "name": "mini-dc-brain",
+  "version": "1.0.0",
+  "description": "Mini-DC Brain (event-driven decision engine)",
+  "type": "module",
+  "main": "src/index.js",
+  "private": true,
+
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "lint": "echo \"no lint configured\"",
+    "test": "echo \"no tests yet\""
+  },
+
+  "dependencies": {
+    "mqtt": "^5.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.0.0"
+  },
+
+  "engines": {
+    "node": ">=18"
+  }
+}

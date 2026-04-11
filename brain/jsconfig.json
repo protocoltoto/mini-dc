@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "baseUrl": "./",
+
+    "paths": {
+      "@core/*": ["src/core/*"],
+      "@rules/*": ["src/rules/*"],
+      "@modules/*": ["src/modules/*"],
+      "@notifier/*": ["src/notifier/*"],
+      "@actuator/*": ["src/actuator/*"],
+      "@utils/*": ["src/utils/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
