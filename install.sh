@@ -1,10 +1,8 @@
-```bash
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 # ======================================
-# MINI-DC INSTALLER (PRODUCTION READY)
+# MINI-DC INSTALLER (LEAN + PRODUCTION)
 # ======================================
 
 echo "======================================"
@@ -14,8 +12,9 @@ echo "======================================"
 # ==============================
 # GLOBAL CONFIG
 # ==============================
-RETRY=10
-SLEEP=3
+RETRY=${RETRY:-10}
+SLEEP=${SLEEP:-3}
+BASE_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # ==============================
 # UTILS
@@ -42,12 +41,12 @@ wait_for_http() {
 
   echo "⏳ Waiting for $name ($url)..."
 
-  for i in $(seq 1 $RETRY); do
+  for i in $(seq 1 "$RETRY"); do
     if curl -sf "$url" >/dev/null 2>&1; then
       echo "✅ $name is ready"
       return 0
     fi
-    sleep $SLEEP
+    sleep "$SLEEP"
   done
 
   fail "$name not reachable: $url"
@@ -58,6 +57,13 @@ run() {
   shift
   log "$name"
   "$@"
+}
+
+svc() {
+  local service=$1
+  local action=$2
+
+  bash "$BASE_DIR/$service/scripts/$action.sh"
 }
 
 # ==============================
@@ -74,61 +80,58 @@ echo "✅ Environment OK"
 # ==============================
 # STEP 1: MQTT
 # ==============================
-run "Step 1: Create MQTT" \
-  bash mqtt/scripts/create-mqtt.sh
-
-run "Step 1: Setup MQTT" \
-  bash mqtt/scripts/setup-mqtt.sh
+run "Step 1: MQTT - Create" svc mqtt create
+run "Step 1: MQTT - Setup"  svc mqtt setup
 
 # ==============================
 # STEP 2: INFLUXDB
 # ==============================
-run "Step 2: Create InfluxDB" \
-  bash monitoring/scripts/create-influx.sh
+run "Step 2: InfluxDB - Create" svc influxdb create
 
 wait_for_http "InfluxDB" "http://influxdb:8086"
 
-run "Step 2: Setup InfluxDB" \
-  bash monitoring/scripts/setup-influx.sh
+run "Step 2: InfluxDB - Setup" svc influxdb setup
 
 # ==============================
 # STEP 3: GRAFANA
 # ==============================
-run "Step 3: Create Grafana" \
-  bash monitoring/scripts/create-grafana.sh
+run "Step 3: Grafana - Create" svc grafana create
 
 wait_for_http "Grafana" "http://grafana:3000"
 
-run "Step 3: Setup Grafana" \
-  bash monitoring/scripts/setup-grafana.sh
+run "Step 3: Grafana - Setup" svc grafana setup
 
 # ==============================
 # STEP 4: TELEGRAF
 # ==============================
-run "Step 4: Create Telegraf" \
-  bash collector/scripts/create-telegraf.sh
-
-run "Step 4: Setup Telegraf" \
-  bash collector/scripts/setup-telegraf.sh
+run "Step 4: Telegraf - Create" svc telegraf create
+run "Step 4: Telegraf - Setup"  svc telegraf setup
 
 # ==============================
-# STEP 5: HOME ASSISTANT OS
+# STEP 5: HOME ASSISTANT
 # ==============================
-run "Step 5: Create HAOS VM" \
-  bash proxmox/scripts/create-haos.sh
+run "Step 5: HAOS - Create VM" \
+  bash "$BASE_DIR/proxmox/scripts/create-haos.sh"
 
 # ==============================
 # FINAL CHECK
 # ==============================
 log "Final Checks"
 
-echo "👉 Verifying services..."
+check_service() {
+  local name=$1
+  local url=$2
 
-echo "- InfluxDB:"
-curl -sf http://influxdb:8086 && echo "  OK" || echo "  FAILED"
+  echo "- $name:"
+  if curl -sf "$url" >/dev/null 2>&1; then
+    echo "  OK"
+  else
+    echo "  FAILED"
+  fi
+}
 
-echo "- Grafana:"
-curl -sf http://grafana:3000 && echo "  OK" || echo "  FAILED"
+check_service "InfluxDB" "http://influxdb:8086"
+check_service "Grafana"  "http://grafana:3000"
 
 echo ""
 echo "======================================"
@@ -140,9 +143,9 @@ echo "👉 Services:"
 echo "   - InfluxDB : http://<IP>:8086"
 echo "   - Grafana  : http://<IP>:3000"
 echo "   - HAOS     : http://<IP>:8123"
+
 echo ""
 echo "👉 Next:"
-echo "   - Run mqtt/config/mqtt.sh (test data)"
+echo "   - Publish MQTT test data"
 echo "   - Open Grafana dashboards"
 echo ""
-```

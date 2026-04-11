@@ -1,15 +1,8 @@
-```bash
 #!/usr/bin/env bash
 
-# ==============================
-# CONFIG (LEAN)
-# ==============================
-CTID=201
-HOSTNAME="grafana"
-
-CORES=1
-MEMORY=512
-DISK="5G"
+set -a
+source ../../proxmox/scripts/load-env.sh grafana
+set +a
 
 BASE_SCRIPT="../../proxmox/scripts/create-lxc.sh"
 
@@ -26,6 +19,8 @@ bash $BASE_SCRIPT $CTID $HOSTNAME $CORES $MEMORY $DISK
 echo "📦 Installing Grafana..."
 
 pct exec $CTID -- bash -c "
+set -e
+
 apt update -y
 apt install -y curl gnupg apt-transport-https software-properties-common
 
@@ -38,9 +33,11 @@ echo 'deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stab
 apt update -y
 apt install -y grafana
 
+# optional: change port
+sed -i 's/^;http_port = .*/http_port = ${GRAFANA_PORT}/' /etc/grafana/grafana.ini
+
 systemctl enable grafana-server
-systemctl start grafana-server
+systemctl restart grafana-server
 "
 
-echo "✅ Grafana ready"
-```
+echo "✅ Grafana ready at port ${GRAFANA_PORT}"

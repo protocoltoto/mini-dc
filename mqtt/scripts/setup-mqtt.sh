@@ -1,32 +1,50 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
-source .env
+# ==============================
+# LOAD ENV
+# ==============================
+set -a
+source ../../proxmox/scripts/load-env.sh mqtt
+set +a
 
-echo "== Installing MQTT =="
+echo "📦 Installing MQTT (Mosquitto)..."
 
 pct exec $CTID -- bash -c "
-apt update &&
+set -e
+
+apt update
 apt install -y mosquitto mosquitto-clients
 "
 
-echo "== Configuring MQTT =="
+# ==============================
+# CONFIGURE MQTT
+# ==============================
+echo "⚙️ Configuring MQTT..."
 
 pct exec $CTID -- bash -c "cat > /etc/mosquitto/mosquitto.conf <<EOF
-listener 1883
-allow_anonymous false
+listener ${MQTT_PORT:-1883}
+allow_anonymous ${MQTT_ALLOW_ANON:-false}
 password_file /etc/mosquitto/passwd
 persistence true
 persistence_location /var/lib/mosquitto/
 EOF"
 
-echo "== Creating user =="
+# ==============================
+# CREATE USER (NON-INTERACTIVE)
+# ==============================
+echo "👤 Creating MQTT user..."
 
-pct exec $CTID -- mosquitto_passwd -c /etc/mosquitto/passwd admin
+pct exec $CTID -- bash -c "
+mosquitto_passwd -b -c /etc/mosquitto/passwd ${MQTT_USER:-admin} ${MQTT_PASSWORD:-admin123}
+"
 
-echo "== Enable service =="
+# ==============================
+# ENABLE SERVICE
+# ==============================
+echo "🚀 Starting MQTT..."
 
 pct exec $CTID -- systemctl enable mosquitto
 pct exec $CTID -- systemctl restart mosquitto
 
-echo "== MQTT Ready =="
+echo "✅ MQTT Ready on port ${MQTT_PORT:-1883}"

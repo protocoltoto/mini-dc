@@ -5,7 +5,7 @@ set -e
 # LOAD ENV
 # ==============================
 set -a
-source ../../proxmox/scripts/load-env.sh mqtt
+source ../../proxmox/scripts/load-env.sh telegraf
 set +a
 
 # ==============================
@@ -13,18 +13,20 @@ set +a
 # ==============================
 BASE_SCRIPT="../../proxmox/scripts/create-lxc.sh"
 
-echo "🚀 Creating MQTT LXC ($CTID)..."
+echo "🚀 Creating Telegraf LXC ($CTID)..."
 
 # ==============================
 # VALIDATE REQUIRED VARS
 # ==============================
 : "${CTID:?missing}"
 : "${HOSTNAME:?missing}"
-: "${STORAGE:?missing}"
 : "${TEMPLATE:?missing}"
+: "${STORAGE:?missing}"
+: "${IP:?missing}"
+: "${GW:?missing}"
 
 # ==============================
-# CREATE VIA TEMPLATE SCRIPT
+# CREATE VIA TEMPLATE
 # ==============================
 bash $BASE_SCRIPT \
   "$CTID" \
@@ -37,4 +39,13 @@ bash $BASE_SCRIPT \
   "$IP" \
   "$GW"
 
-echo "✅ MQTT LXC created via template"
+echo "📦 Starting container..."
+pct start $CTID
+
+# ==============================
+# BASIC HEALTH CHECK
+# ==============================
+echo "🔍 Checking container status..."
+pct status $CTID
+
+echo "✅ Telegraf LXC created and running"
